@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sheet Manager - Retro Style</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Press+Start+2P&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3a 50%, #2d1b69 100%);
+            color: #00ff41;
+            font-family: 'Orbitron', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .retro-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 65, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            z-index: -1;
+        }
+        
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+        }
+        
+        .logo {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2.5rem;
+            color: #ff0080;
+            text-shadow: 
+                0 0 10px #ff0080,
+                0 0 20px #ff0080,
+                0 0 30px #ff0080;
+            margin-bottom: 10px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #ff0080, 0 0 20px #ff0080, 0 0 30px #ff0080; }
+            to { text-shadow: 0 0 15px #ff0080, 0 0 25px #ff0080, 0 0 35px #ff0080, 0 0 40px #ff0080; }
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #00ffff;
+            margin-top: 15px;
+            text-shadow: 0 0 10px #00ffff;
+        }
+        
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            background: linear-gradient(145deg, #1a1a3a, #0f0f23);
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            padding: 15px 30px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-btn:hover {
+            background: linear-gradient(145deg, #00ff41, #00cc33);
+            color: #0f0f23;
+            box-shadow: 
+                0 0 20px #00ff41,
+                inset 0 0 20px rgba(0, 255, 65, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: linear-gradient(145deg, #ff0080, #cc0066);
+            border-color: #ff0080;
+            color: white;
+            box-shadow: 0 0 25px #ff0080;
+        }
+        
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .nav-btn:hover::before {
+            left: 100%;
+        }
+        
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .sheet-container {
+            background: linear-gradient(145deg, rgba(26, 26, 58, 0.8), rgba(15, 15, 35, 0.9));
+            border: 2px solid #00ffff;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 8px 32px rgba(0, 255, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .sheet-title {
+            font-size: 1.5rem;
+            color: #ff0080;
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .sheet-list {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .sheet-item {
+            background: linear-gradient(145deg, rgba(0, 255, 65, 0.1), rgba(0, 255, 255, 0.1));
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .sheet-item:hover {
+            transform: translateX(10px);
+            box-shadow: -5px 5px 15px rgba(0, 255, 65, 0.3);
+        }
+        
+        .sheet-name {
+            font-weight: 700;
+            color: #00ffff;
+            font-size: 1.1rem;
+        }
+        
+        .sheet-url {
+            color: #00ff41;
+            font-size: 0.9rem;
+            word-break: break-all;
+            max-width: 60%;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background: linear-gradient(145deg, #ff0080, #cc0066);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+        
+        .action-btn:hover {
+            background: linear-gradient(145deg, #ff4da6, #ff0080);
+            box-shadow: 0 0 15px #ff0080;
+            transform: scale(1.05);
+        }
+        
+        .add-form {
+            background: linear-gradient(145deg, rgba(255, 0, 128, 0.1), rgba(0, 255, 255, 0.1));
+            border: 2px solid #ff0080;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            color: #00ffff;
+            margin-bottom: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .form-input {
+            width: 100%;
+            background: rgba(15, 15, 35, 0.8);
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            padding: 12px 15px;
+            border-radius: 5px;
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            color: #00ffff;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(145deg, #00ff41, #00cc33);
+            border: none;
+            color: #0f0f23;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .submit-btn:hover {
+            background: linear-gradient(145deg, #33ff66, #00ff41);
+            box-shadow: 0 0 25px #00ff41;
+            transform: translateY(-2px);
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .nav-menu {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-btn {
+                width: 200px;
+            }
+            
+            .sheet-item {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .sheet-url {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="retro-grid"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1 class="logo">SHEET MANAGER</h1>
+            <p class="subtitle">Retro Data Storage System</p>
+        </div>
+        
+        <nav class="nav-menu">
+            <button class="nav-btn active" onclick="showSection('rsq')">RSQ</button>
+            <button class="nav-btn" onclick="showSection('botnet')">BOTNET</button>
+            <button class="nav-btn" onclick="showSection('rsa')">RSA</button>
+        </nav>
+        
+        <div id="rsq" class="content-section active">
+            <div class="add-form">
+                <h3 class="sheet-title">Thêm RSQ Sheet Mới</h3>
+                <div class="form-group">
+                    <label class="form-label">Tên Sheet:</label>
+                    <input type="text" class="form-input" id="rsq-name" placeholder="Nhập tên sheet...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">URL Sheet:</label>
+                    <input type="url" class="form-input" id="rsq-url" placeholder="https://docs.google.com/spreadsheets/...">
+                </div>
+                <button class="submit-btn" onclick="addSheet('rsq')">Thêm Sheet</button>
+            </div>
+            
+            <div class="sheet-container">
+                <h2 class="sheet-title">RSQ Sheets</h2>
+                <div class="sheet-list" id="rsq-list">
+                    <div class="empty-state">Chưa có sheet nào. Thêm sheet đầu tiên!</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="botnet" class="content-section">
+            <div class="add-form">
+                <h3 class="sheet-title">Thêm BOTNET Sheet Mới</h3>
+                <div class="form-group">
+                    <label class="form-label">Tên Sheet:</label>
+                    <input type="text" class="form-input" id="botnet-name" placeholder="Nhập tên sheet...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">URL Sheet:</label>
+                    <input type="url" class="form-input" id="botnet-url" placeholder="https://docs.google.com/spreadsheets/...">
+                </div>
+                <button class="submit-btn" onclick="addSheet('botnet')">Thêm Sheet</button>
+            </div>
+            
+            <div class="sheet-container">
+                <h2 class="sheet-title">BOTNET Sheets</h2>
+                <div class="sheet-list" id="botnet-list">
+                    <div class="empty-state">Chưa có sheet nào. Thêm sheet đầu tiên!</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="rsa" class="content-section">
+            <div class="add-form">
+                <h3 class="sheet-title">Thêm RSA Sheet Mới</h3>
+                <div class="form-group">
+                    <label class="form-label">Tên Sheet:</label>
+                    <input type="text" class="form-input" id="rsa-name" placeholder="Nhập tên sheet...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">URL Sheet:</label>
+                    <input type="url" class="form-input" id="rsa-url" placeholder="https://docs.google.com/spreadsheets/...">
+                </div>
+                <button class="submit-btn" onclick="addSheet('rsa')">Thêm Sheet</button>
+            </div>
+            
+            <div class="sheet-container">
+                <h2 class="sheet-title">RSA Sheets</h2>
+                <div class="sheet-list" id="rsa-list">
+                    <div class="empty-state">Chưa có sheet nào. Thêm sheet đầu tiên!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Lưu trữ dữ liệu trong memory
+        let sheetsData = {
+            rsq: [],
+            botnet: [],
+            rsa: []
+        };
+        
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(s => {
+                s.classList.remove('active');
+            });
+            
+            // Remove active class from all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(section).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            // Render sheets for this section
+            renderSheets(section);
+        }
+        
+        function addSheet(category) {
+            const nameInput = document.getElementById(`${category}-name`);
+            const urlInput = document.getElementById(`${category}-url`);
+            
+            const name = nameInput.value.trim();
+            const url = urlInput.value.trim();
+            
+            if (!name || !url) {
+                alert('Vui lòng nhập đầy đủ tên và URL của sheet!');
+                return;
+            }
+            
+            if (!isValidUrl(url)) {
+                alert('URL không hợp lệ!');
+                return;
+            }
+            
+            const newSheet = {
+                id: Date.now(),
+                name: name,
+                url: url,
+                createdAt: new Date().toLocaleDateString('vi-VN')
+            };
+            
+            sheetsData[category].push(newSheet);
+            
+            // Clear inputs
+            nameInput.value = '';
+            urlInput.value = '';
+            
+            // Re-render
+            renderSheets(category);
+            
+            // Success feedback
+            nameInput.placeholder = 'Đã thêm thành công!';
+            setTimeout(() => {
+                nameInput.placeholder = 'Nhập tên sheet...';
+            }, 2000);
+        }
+        
+        function renderSheets(category) {
+            const listElement = document.getElementById(`${category}-list`);
+            const sheets = sheetsData[category];
+            
+            if (sheets.length === 0) {
+                listElement.innerHTML = '<div class="empty-state">Chưa có sheet nào. Thêm sheet đầu tiên!</div>';
+                return;
+            }
+            
+            listElement.innerHTML = sheets.map(sheet => `
+                <div class="sheet-item">
+                    <div>
+                        <div class="sheet-name">${sheet.name}</div>
+                        <div class="sheet-url">${sheet.url}</div>
+                        <small style="color: #666; margin-top: 5px; display: block;">Ngày tạo: ${sheet.createdAt}</small>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="openSheet('${sheet.url}')">Mở</button>
+                        <button class="action-btn" onclick="copyUrl('${sheet.url}')">Copy</button>
+                        <button class="action-btn" onclick="deleteSheet('${category}', ${sheet.id})">Xóa</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function openSheet(url) {
+            window.open(url, '_blank');
+        }
+        
+        function copyUrl(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                // Visual feedback
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = 'linear-gradient(145deg, #00ff41, #00cc33)';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'linear-gradient(145deg, #ff0080, #cc0066)';
+                }, 1000);
+            });
+        }
+        
+        function deleteSheet(category, id) {
+            if (confirm('Bạn có chắc chắn muốn xóa sheet này?')) {
+                sheetsData[category] = sheetsData[category].filter(sheet => sheet.id !== id);
+                renderSheets(category);
+            }
+        }
+        
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+        
+        // Initialize
+        renderSheets('rsq');
+    </script>
+</body>
+</html>
