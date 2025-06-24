@@ -8,25 +8,125 @@
   <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.24.7/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body {
-      background: radial-gradient(ellipse at center, #0d1b2a 0%, #000000 100%);
-      font-family: 'Orbitron', 'Courier New', monospace;
-      color: #d3f9f5;
+      background: linear-gradient(135deg, #f8f6f0 0%, #faf9f6 25%, #f5f3ed 50%, #f8f6f0 75%, #fdfcf8 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      color: #2c2c2c;
+      line-height: 1.6;
+      min-height: 100vh;
     }
-    .retro-border {
-      border: 2px dashed #f9c74f;
-      box-shadow: 0 0 20px #f9c74f88;
+    
+    .elegant-shadow {
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04);
     }
-    .retro-glow:hover {
-      background-color: #1a1a1a;
-      color: #f9c74f;
-      box-shadow: 0 0 5px #f9c74f, 0 0 10px #f9c74f, 0 0 20px #f9c74f;
+    
+    .elegant-border {
+      border: 1px solid rgba(200, 200, 200, 0.3);
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+    }
+    
+    .elegant-hover {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .elegant-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 6px 20px rgba(0, 0, 0, 0.06);
+    }
+    
+    .gold-accent {
+      background: linear-gradient(135deg, #d4af37, #f4e27c);
+      color: #2c2c2c;
+    }
+    
+    .gold-accent:hover {
+      background: linear-gradient(135deg, #c19b26, #e6d06b);
+    }
+    
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .input-elegant {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(200, 200, 200, 0.4);
+      transition: all 0.3s ease;
+    }
+    
+    .input-elegant:focus {
+      outline: none;
+      border-color: #d4af37;
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+    
+    .btn-elegant {
+      background: linear-gradient(135deg, #2c2c2c, #404040);
+      color: white;
+      border: none;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-elegant:hover {
+      background: linear-gradient(135deg, #404040, #2c2c2c);
+      transform: translateY(-1px);
+    }
+    
+    .tab-elegant {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(200, 200, 200, 0.3);
+      color: #666;
+      transition: all 0.3s ease;
+    }
+    
+    .tab-elegant.active {
+      background: linear-gradient(135deg, #d4af37, #f4e27c);
+      color: #2c2c2c;
+      border-color: #d4af37;
+    }
+    
+    .tab-elegant:hover:not(.active) {
+      background: rgba(212, 175, 55, 0.1);
+      border-color: rgba(212, 175, 55, 0.3);
+    }
+    
+    .sheet-card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(200, 200, 200, 0.2);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .sheet-card:hover {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: rgba(212, 175, 55, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    .login-form {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(200, 200, 200, 0.3);
+    }
+    
+    .vietnam-flag {
+      background: linear-gradient(135deg, #da020e, #ff1744);
+      color: white;
     }
   </style>
 </head>
@@ -125,14 +225,42 @@
 
       if (!isLoggedIn) {
         return (
-          <div className="flex items-center justify-center min-h-screen bg-black bg-opacity-80">
-            <div className="bg-green-900 p-10 rounded-lg retro-border w-96 text-center">
-              <h2 className="text-xl font-bold text-yellow-300 mb-2">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h2>
-              <p className="text-yellow-200 mb-6">Độc lập - Tự do - Hạnh phúc</p>
-              <form onSubmit={handleLogin} className="space-y-4">
-                <input type="text" name="username" placeholder="Username" className="w-full p-2 rounded bg-green-800 text-white" required />
-                <input type="password" name="password" placeholder="Password" className="w-full p-2 rounded bg-green-800 text-white" required />
-                <button type="submit" className="w-full bg-yellow-400 hover:bg-yellow-500 p-2 rounded text-black font-bold">Đăng nhập</button>
+          <div className="flex items-center justify-center min-h-screen p-4">
+            <div className="login-form p-10 rounded-2xl elegant-shadow w-full max-w-md">
+              <div className="text-center mb-8">
+                <div className="vietnam-flag p-4 rounded-xl mb-4">
+                  <h2 className="text-lg font-semibold">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h2>
+                  <p className="text-sm opacity-90">Độc lập - Tự do - Hạnh phúc</p>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-2">Đăng nhập hệ thống</h3>
+                <p className="text-gray-600">Vui lòng nhập thông tin đăng nhập</p>
+              </div>
+              
+              <form onSubmit={handleLogin} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Tên đăng nhập</label>
+                  <input 
+                    type="text" 
+                    name="username" 
+                    className="w-full p-4 rounded-lg input-elegant text-gray-800 font-medium"
+                    required 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Mật khẩu</label>
+                  <input 
+                    type="password" 
+                    name="password" 
+                    className="w-full p-4 rounded-lg input-elegant text-gray-800 font-medium"
+                    required 
+                  />
+                </div>
+                <button 
+                  type="submit" 
+                  className="w-full gold-accent p-4 rounded-lg font-semibold elegant-hover"
+                >
+                  Đăng nhập
+                </button>
               </form>
             </div>
           </div>
@@ -140,60 +268,182 @@
       }
 
       return (
-        <div className="container mx-auto p-6">
-          <header className="text-center mb-6">
-            <h1 className="text-4xl font-bold text-yellow-400 drop-shadow-lg">🛰 Marketing Sheet Manager</h1>
-            <p className="text-gray-400">Bạn có sheet, tôi có space</p>
-          </header>
-
-          <div className="bg-gray-900 p-6 rounded-lg mb-6 retro-border">
-            <form onSubmit={addSheet} className="space-y-4">
-              <input type="text" placeholder="Sheet Name" value={newSheet.name} onChange={(e) => setNewSheet({ ...newSheet, name: e.target.value })} className="w-full p-2 rounded bg-gray-800" required />
-              <input type="text" placeholder="URL" value={newSheet.url} onChange={(e) => setNewSheet({ ...newSheet, url: e.target.value })} className="w-full p-2 rounded bg-gray-800" required />
-              <select value={newSheet.folder} onChange={(e) => setNewSheet({ ...newSheet, folder: e.target.value })} className="w-full p-2 rounded bg-gray-800">
-                <option value="RSA">RSA</option>
-                <option value="RSQ">RSQ</option>
-                <option value="RAF">RAF</option>
-              </select>
-              <select value={newSheet.subfolder} onChange={(e) => setNewSheet({ ...newSheet, subfolder: e.target.value })} className="w-full p-2 rounded bg-gray-800">
-                <option value="Tài liệu">Tài liệu</option>
-                <option value="Kế hoạch">Kế hoạch</option>
-              </select>
-              <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded text-white font-semibold">Add Sheet</button>
-            </form>
-          </div>
-
-          <div className="flex space-x-2 mb-4 justify-center">
-            {['RSA', 'RSQ', 'RAF'].map(folder => (
-              <button key={folder} onClick={() => setSelectedFolder(folder)} className={`p-2 rounded retro-glow ${selectedFolder === folder ? 'bg-yellow-400 text-black' : 'bg-gray-700'}`}>{folder}</button>
-            ))}
-          </div>
-
-          <div className="flex space-x-2 mb-4 justify-center">
-            {['All', 'Tài liệu', 'Kế hoạch'].map(sub => (
-              <button key={sub} onClick={() => setSelectedSubfolder(sub)} className={`p-2 rounded ${selectedSubfolder === sub ? 'bg-yellow-300 text-black' : 'bg-gray-800'}`}>{sub}</button>
-            ))}
-          </div>
-
-          <div className="flex justify-center mb-6">
-            <input type="text" placeholder="Tìm sheet..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="p-2 rounded w-1/2 bg-gray-800" />
-          </div>
-
-          <div className="grid grid-cols-1 gap-4">
-            {filteredSheets.map(sheet => (
-              <div key={sheet.id} className="bg-gray-800 p-4 rounded flex justify-between items-center retro-border">
-                <div>
-                  <a href={sheet.url} target="_blank" className="text-blue-400 hover:underline text-lg font-bold">{sheet.name}</a>
-                  <p className="text-sm text-gray-400">{sheet.folder} / {sheet.subfolder}</p>
-                </div>
-                {userRole === 'admin' && (
-                  <button onClick={() => deleteSheet(sheet.id)} className="bg-red-600 hover:bg-red-700 p-2 rounded text-white">Delete</button>
-                )}
+        <div className="min-h-screen p-6">
+          <div className="max-w-6xl mx-auto">
+            <header className="text-center mb-12">
+              <div className="inline-block p-8 glass-effect rounded-2xl elegant-shadow mb-6">
+                <h1 className="text-5xl font-bold text-gray-800 mb-2">
+                  📊 Marketing Sheet Manager
+                </h1>
+                <p className="text-xl text-gray-600 font-medium">
+                  Bạn có sheet, tôi có space
+                </p>
               </div>
-            ))}
-          </div>
+            </header>
 
-          <footer className="mt-10 text-center text-gray-400 text-sm">Created by MarketingTeamVN</footer>
+            <div className="glass-effect p-8 rounded-2xl mb-8 elegant-shadow">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6">Thêm Sheet Mới</h2>
+              <form onSubmit={addSheet} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Tên Sheet</label>
+                    <input 
+                      type="text" 
+                      placeholder="Nhập tên sheet..." 
+                      value={newSheet.name} 
+                      onChange={(e) => setNewSheet({ ...newSheet, name: e.target.value })} 
+                      className="w-full p-4 rounded-lg input-elegant text-gray-800"
+                      required 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">URL</label>
+                    <input 
+                      type="text" 
+                      placeholder="Nhập URL..." 
+                      value={newSheet.url} 
+                      onChange={(e) => setNewSheet({ ...newSheet, url: e.target.value })} 
+                      className="w-full p-4 rounded-lg input-elegant text-gray-800"
+                      required 
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Thư mục</label>
+                    <select 
+                      value={newSheet.folder} 
+                      onChange={(e) => setNewSheet({ ...newSheet, folder: e.target.value })} 
+                      className="w-full p-4 rounded-lg input-elegant text-gray-800"
+                    >
+                      <option value="RSA">RSA</option>
+                      <option value="RSQ">RSQ</option>
+                      <option value="RAF">RAF</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Thư mục con</label>
+                    <select 
+                      value={newSheet.subfolder} 
+                      onChange={(e) => setNewSheet({ ...newSheet, subfolder: e.target.value })} 
+                      className="w-full p-4 rounded-lg input-elegant text-gray-800"
+                    >
+                      <option value="Tài liệu">Tài liệu</option>
+                      <option value="Kế hoạch">Kế hoạch</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <button 
+                  type="submit" 
+                  className="w-full btn-elegant p-4 rounded-lg font-semibold elegant-hover"
+                >
+                  Thêm Sheet
+                </button>
+              </form>
+            </div>
+
+            <div className="glass-effect p-8 rounded-2xl mb-8 elegant-shadow">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6">Lọc & Tìm kiếm</h2>
+              
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-3">Thư mục chính</label>
+                <div className="flex flex-wrap gap-3">
+                  {['RSA', 'RSQ', 'RAF'].map(folder => (
+                    <button 
+                      key={folder} 
+                      onClick={() => setSelectedFolder(folder)} 
+                      className={`px-6 py-3 rounded-lg font-medium elegant-hover tab-elegant ${selectedFolder === folder ? 'active' : ''}`}
+                    >
+                      {folder}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-3">Thư mục con</label>
+                <div className="flex flex-wrap gap-3">
+                  {['All', 'Tài liệu', 'Kế hoạch'].map(sub => (
+                    <button 
+                      key={sub} 
+                      onClick={() => setSelectedSubfolder(sub)} 
+                      className={`px-6 py-3 rounded-lg font-medium elegant-hover tab-elegant ${selectedSubfolder === sub ? 'active' : ''}`}
+                    >
+                      {sub}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">Tìm kiếm</label>
+                <input 
+                  type="text" 
+                  placeholder="Tìm sheet theo tên..." 
+                  value={searchQuery} 
+                  onChange={(e) => setSearchQuery(e.target.value)} 
+                  className="w-full p-4 rounded-lg input-elegant text-gray-800"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+                Danh sách Sheet ({filteredSheets.length})
+              </h2>
+              
+              {filteredSheets.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="text-6xl mb-4">📋</div>
+                  <p className="text-xl text-gray-600">Không tìm thấy sheet nào</p>
+                </div>
+              ) : (
+                filteredSheets.map(sheet => (
+                  <div key={sheet.id} className="sheet-card p-6 rounded-xl elegant-shadow">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <a 
+                          href={sheet.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-xl font-semibold text-gray-800 hover:text-yellow-600 transition-colors duration-300 block mb-2"
+                        >
+                          {sheet.name}
+                        </a>
+                        <div className="flex items-center space-x-4 text-sm text-gray-600">
+                          <span className="px-3 py-1 bg-gray-100 rounded-full font-medium">
+                            {sheet.folder}
+                          </span>
+                          <span className="px-3 py-1 bg-gray-100 rounded-full font-medium">
+                            {sheet.subfolder}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {userRole === 'admin' && (
+                        <button 
+                          onClick={() => deleteSheet(sheet.id)} 
+                          className="ml-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-300"
+                        >
+                          Xóa
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <footer className="mt-16 text-center py-8">
+              <div className="inline-block glass-effect px-8 py-4 rounded-xl elegant-shadow">
+                <p className="text-gray-600 font-medium">
+                  Created by <span className="text-yellow-600 font-semibold">MarketingTeamVN</span>
+                </p>
+              </div>
+            </footer>
+          </div>
         </div>
       );
     };
