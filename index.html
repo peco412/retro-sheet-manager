@@ -158,6 +158,10 @@
       const [newSheet, setNewSheet] = useState({ name: '', url: '', folder: 'RSA', subfolder: 'Tài liệu' });
       const [selectedFolder, setSelectedFolder] = useState('RSA');
       const [selectedSubfolder, setSelectedSubfolder] = useState('All');
+      const [editingSheet, setEditingSheet] = useState(null);
+      const [editForm, setEditForm] = useState({ name: '', url: '', folder: '', subfolder: '' });
+      const [currentPage, setCurrentPage] = useState(1);
+      const sheetsPerPage = 8;
 
       const credentials = {
         admin: { username: 'QLAPT', password: 'QLAPT', role: 'admin' },
@@ -178,6 +182,7 @@
       const addSheet = async (e) => {
         e.preventDefault();
         if (!newSheet.name || !newSheet.url) return alert("Please fill all fields");
+        
         try {
           await db.collection("sheets").add(newSheet);
           setNewSheet({ name: '', url: '', folder: 'RSA', subfolder: 'Tài liệu' });
@@ -185,6 +190,34 @@
         } catch (err) {
           alert("Error adding sheet");
         }
+      };
+
+      const editSheet = (sheet) => {
+        setEditingSheet(sheet.id);
+        setEditForm({
+          name: sheet.name,
+          url: sheet.url,
+          folder: sheet.folder,
+          subfolder: sheet.subfolder
+        });
+      };
+
+      const updateSheet = async (e) => {
+        e.preventDefault();
+        if (!editForm.name || !editForm.url) return alert("Please fill all fields");
+        try {
+          await db.collection("sheets").doc(editingSheet).update(editForm);
+          setEditingSheet(null);
+          setEditForm({ name: '', url: '', folder: '', subfolder: '' });
+          fetchSheets();
+        } catch (err) {
+          alert("Error updating sheet");
+        }
+      };
+
+      const cancelEdit = () => {
+        setEditingSheet(null);
+        setEditForm({ name: '', url: '', folder: '', subfolder: '' });
       };
 
       const deleteSheet = async (id) => {
@@ -221,7 +254,26 @@
         if (selectedSubfolder !== 'All') filtered = filtered.filter(sheet => sheet.subfolder === selectedSubfolder);
         if (searchQuery) filtered = filtered.filter(sheet => sheet.name.toLowerCase().includes(searchQuery.toLowerCase()));
         setFilteredSheets(filtered);
+        setCurrentPage(1); // Reset to first page when filtering
       }, [sheets, selectedFolder, selectedSubfolder, searchQuery]);
+
+      // Calculate pagination
+      const totalPages = Math.ceil(filteredSheets.length / sheetsPerPage);
+      const startIndex = (currentPage - 1) * sheetsPerPage;
+      const endIndex = startIndex + sheetsPerPage;
+      const currentSheets = filteredSheets.slice(startIndex, endIndex);
+
+      const goToPage = (page) => {
+        setCurrentPage(page);
+      };
+
+      const goToPrevPage = () => {
+        if (currentPage > 1) setCurrentPage(currentPage - 1);
+      };
+
+      const goToNextPage = () => {
+        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+      };
 
       if (!isLoggedIn) {
         return (
@@ -229,8 +281,8 @@
             <div className="login-form p-10 rounded-2xl elegant-shadow w-full max-w-md">
               <div className="text-center mb-8">
                 <div className="vietnam-flag p-4 rounded-xl mb-4">
-                  <h2 className="text-lg font-semibold">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h2>
-                  <p className="text-sm opacity-90">Độc lập - Tự do - Hạnh phúc</p>
+                  <h2 className="text-lg font-semibold">QLAPT's Home</h2>
+                  <p className="text-sm opacity-90">Welcome to our paradise</p>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-800 mb-2">Đăng nhập hệ thống</h3>
                 <p className="text-gray-600">Vui lòng nhập thông tin đăng nhập</p>
@@ -390,49 +442,178 @@
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-                Danh sách Sheet ({filteredSheets.length})
-              </h2>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold text-gray-800">
+                  Danh sách Sheet
+                </h2>
+                <div className="text-sm text-gray-600">
+                  <span className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full">
+                    Tổng: {filteredSheets.length} sheet
+                  </span>
+                </div>
+              </div>
               
-              {filteredSheets.length === 0 ? (
+              {currentSheets.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="text-6xl mb-4">📋</div>
                   <p className="text-xl text-gray-600">Không tìm thấy sheet nào</p>
                 </div>
               ) : (
-                filteredSheets.map(sheet => (
-                  <div key={sheet.id} className="sheet-card p-6 rounded-xl elegant-shadow">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <a 
-                          href={sheet.url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-xl font-semibold text-gray-800 hover:text-yellow-600 transition-colors duration-300 block mb-2"
-                        >
-                          {sheet.name}
-                        </a>
-                        <div className="flex items-center space-x-4 text-sm text-gray-600">
-                          <span className="px-3 py-1 bg-gray-100 rounded-full font-medium">
-                            {sheet.folder}
-                          </span>
-                          <span className="px-3 py-1 bg-gray-100 rounded-full font-medium">
-                            {sheet.subfolder}
-                          </span>
-                        </div>
+                <>
+                  <div className="grid grid-cols-1 gap-4">
+                    {currentSheets.map(sheet => (
+                      <div key={sheet.id} className="sheet-card p-6 rounded-xl elegant-shadow">
+                        {editingSheet === sheet.id ? (
+                          <form onSubmit={updateSheet} className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <input 
+                                type="text" 
+                                value={editForm.name}
+                                onChange={(e) => setEditForm({...editForm, name: e.target.value})}
+                                className="p-3 rounded-lg input-elegant text-gray-800"
+                                required 
+                              />
+                              <input 
+                                type="text" 
+                                value={editForm.url}
+                                onChange={(e) => setEditForm({...editForm, url: e.target.value})}
+                                className="p-3 rounded-lg input-elegant text-gray-800"
+                                required 
+                              />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <select 
+                                value={editForm.folder}
+                                onChange={(e) => setEditForm({...editForm, folder: e.target.value})}
+                                className="p-3 rounded-lg input-elegant text-gray-800"
+                              >
+                                <option value="RSA">RSA</option>
+                                <option value="RSQ">RSQ</option>
+                                <option value="RAF">RAF</option>
+                              </select>
+                              <select 
+                                value={editForm.subfolder}
+                                onChange={(e) => setEditForm({...editForm, subfolder: e.target.value})}
+                                className="p-3 rounded-lg input-elegant text-gray-800"
+                              >
+                                <option value="Tài liệu">Tài liệu</option>
+                                <option value="Kế hoạch">Kế hoạch</option>
+                              </select>
+                            </div>
+                            <div className="flex space-x-3">
+                              <button 
+                                type="submit"
+                                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-300"
+                              >
+                                Lưu
+                              </button>
+                              <button 
+                                type="button"
+                                onClick={cancelEdit}
+                                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-300"
+                              >
+                                Hủy
+                              </button>
+                            </div>
+                          </form>
+                        ) : (
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <a 
+                                href={sheet.url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-xl font-semibold text-gray-800 hover:text-yellow-600 transition-colors duration-300 block mb-2"
+                              >
+                                {sheet.name}
+                              </a>
+                              <div className="flex items-center space-x-4 text-sm text-gray-600">
+                                <span className="px-3 py-1 bg-gray-100 rounded-full font-medium">
+                                  {sheet.folder}
+                                </span>
+                                <span className="px-3 py-1 bg-gray-100 rounded-full font-medium">
+                                  {sheet.subfolder}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {userRole === 'admin' && (
+                              <div className="flex space-x-2 ml-4">
+                                <button 
+                                  onClick={() => editSheet(sheet)}
+                                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-300"
+                                >
+                                  Sửa
+                                </button>
+                                <button 
+                                  onClick={() => deleteSheet(sheet.id)} 
+                                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-300"
+                                >
+                                  Xóa
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex justify-center items-center space-x-2 mt-8">
+                      <button 
+                        onClick={goToPrevPage}
+                        disabled={currentPage === 1}
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors duration-300 ${
+                          currentPage === 1 
+                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                            : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                        }`}
+                      >
+                        ← Trước
+                      </button>
+                      
+                      <div className="flex space-x-1">
+                        {[...Array(totalPages)].map((_, index) => {
+                          const page = index + 1;
+                          return (
+                            <button
+                              key={page}
+                              onClick={() => goToPage(page)}
+                              className={`px-4 py-2 rounded-lg font-medium transition-colors duration-300 ${
+                                currentPage === page
+                                  ? 'gold-accent'
+                                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                              }`}
+                            >
+                              {page}
+                            </button>
+                          );
+                        })}
                       </div>
                       
-                      {userRole === 'admin' && (
-                        <button 
-                          onClick={() => deleteSheet(sheet.id)} 
-                          className="ml-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-300"
-                        >
-                          Xóa
-                        </button>
-                      )}
+                      <button 
+                        onClick={goToNextPage}
+                        disabled={currentPage === totalPages}
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors duration-300 ${
+                          currentPage === totalPages 
+                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                            : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                        }`}
+                      >
+                        Sau →
+                      </button>
                     </div>
-                  </div>
-                ))
+                  )}
+
+                  {/* Page info */}
+                  {totalPages > 1 && (
+                    <div className="text-center text-sm text-gray-600 mt-4">
+                      Trang {currentPage} / {totalPages} - Hiển thị {startIndex + 1}-{Math.min(endIndex, filteredSheets.length)} / {filteredSheets.length} sheet
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
